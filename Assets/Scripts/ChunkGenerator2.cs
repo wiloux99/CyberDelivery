@@ -13,21 +13,25 @@ public class ChunkGenerator2 : MonoBehaviour
     public Coroutine ik;
     public int currentItem;
 
+    public Vector3 Origin;
+
     // Start is called before the first frame update
     void Start()
     {
-
-            StartCoroutine(SpreadItem());
+        SpawnCunck(Origin, numItemsToSpawn);
     }
 
-    IEnumerator SpreadItem()
+    void SpawnCunck(Vector3 Origin, int numToSpawn)
     {
-        while (currentItem < numItemsToSpawn)
+        for (int i = 0; i < numToSpawn; i++)
         {
-            Vector3 randPosition = new Vector3(Random.Range(-itemXSpread, itemXSpread), Random.Range(-itemYSpread, itemYSpread), Random.Range(-itemZSpread, itemZSpread)) + transform.position;
-            GameObject clone = Instantiate(itemToSpread, randPosition, itemToSpread.transform.rotation);
-            yield return new WaitForSeconds(0.1f);
+            SpreadItem(Origin);
         }
+    }
 
+    void SpreadItem(Vector3 Origin)
+    {
+        Vector3 randPosition = new Vector3(Origin.x + Random.Range(-itemXSpread, itemXSpread), Origin.y + Random.Range(-itemYSpread, itemYSpread), Origin.z+ Random.Range(-itemZSpread, itemZSpread)) + transform.position;
+        GameObject clone = Instantiate(itemToSpread, randPosition, itemToSpread.transform.rotation);
     }
 }

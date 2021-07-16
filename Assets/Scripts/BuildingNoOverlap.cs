@@ -21,9 +21,9 @@ public class BuildingNoOverlap : MonoBehaviour
     void PositionRaycast()
     {
         randomIndex = Random.Range(0, itemsToPickFrom.Length);
-        spawnRotation = Random.rotation;
-        spawnRotation.x = 0;
-        spawnRotation.z = 0;
+        //spawnRotation = Random.rotation;
+        //spawnRotation.x = 0;
+        //spawnRotation.z = 0;
 
         boxCollider = itemsToPickFrom[randomIndex].GetComponent<BoxCollider>();
         Vector3 overlapTestBoxScale = boxCollider.size;
