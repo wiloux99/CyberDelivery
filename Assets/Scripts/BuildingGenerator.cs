@@ -15,8 +15,8 @@ public static class BuildingGenerator
         float topLeftZ = (height - 1) / 2f;
 
 
-        int streetInt = Random.Range(height / 3, height);
-        int streetWidth = Random.Range(1, 5);
+       // int streetInt = Random.Range(height / 3, height);
+       // int streetWidth = Random.Range(1, 5);
 
         for (int y = 0; y < height; y++)
         {
@@ -25,12 +25,12 @@ public static class BuildingGenerator
                 if (heightMap[x, y] > regions[0].height)
                 {
                     
-                    if(EndlessTerrain.IsBetween(y, streetInt - streetWidth, streetInt + streetWidth))
-                    {
-                        break;
-                    }
+                    //if(EndlessTerrain.IsBetween(y, streetInt - streetWidth, streetInt + streetWidth))
+                    //{
+                    //    break;
+                    //}
 
-                    allPos.Add(new Vector3(topLeftX + x, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, topLeftZ - y));
+                    allPos.Add(new Vector3(x + topLeftX, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier,y - topLeftZ));
                 }
             }
         }

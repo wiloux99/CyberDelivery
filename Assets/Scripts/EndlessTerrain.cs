@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class EndlessTerrain : MonoBehaviour
 {
-    public const float maxViewDist = 450;
+    public const float maxViewDist = 450/4;
     public Transform viewer;
-   
+
 
     public static Vector2 viewerPosition;
     static MapGenerator mapGenerator;
-    int chunckSize;
+    public int chunckSize;
     int chunckVisibleInViewDist;
 
     Dictionary<Vector2, TerrainChunck> terrainChunckDictionary = new Dictionary<Vector2, TerrainChunck>();
@@ -38,7 +38,7 @@ public class EndlessTerrain : MonoBehaviour
 
     void UpdateVisibleChuncks()
     {
-        for(int i = 0; i < terrainChuncksVisibleLastUpdate.Count; i++)
+        for (int i = 0; i < terrainChuncksVisibleLastUpdate.Count; i++)
         {
             terrainChuncksVisibleLastUpdate[i].SetVisible(false);
         }
@@ -85,19 +85,36 @@ public class EndlessTerrain : MonoBehaviour
             bounds = new Bounds(position, Vector2.one * size);
             Vector3 positionV3 = new Vector3(position.x, 0, position.y);
 
-            meshObject = new GameObject("Terrain Chunck");
-            meshObject.transform.position = positionV3;
+
+            meshObject = new GameObject("CityChunck");
             meshObject.transform.localScale = Vector3.one * size / 10f;
+            meshObject.transform.position = positionV3;
             meshObject.transform.parent = parent;
+
+
+         //   OnPositionDataReceived(mapData, meshObject);
+
+
             SetVisible(false);
-            mapGenerator.RequestMapData(OnMapDataReceived);
+         //   Debug.Log(meshObject);
+            mapGenerator.RequestMapData(OnMapDataReceived, meshObject);
         }
 
-        void OnMapDataReceived(MapData mapData)
+        void OnMapDataReceived(MapData posData)
         {
-
+            int i = 0;
+            foreach (Vector3 position in posData.pos)
+            {
+                i++;
+                GameObject newBuilding = Instantiate(posData.buildings[Random.Range(0, posData.buildings.Count)], posData.gameObject.transform);
+                newBuilding.transform.name = "N°"+i;
+                newBuilding.transform.localPosition =position;
+            }
         }
 
+        void OnPositionDataReceived(MapData posData, GameObject _meshObject = null)
+        {
+        }
 
         public void UpdateChunck()
         {
