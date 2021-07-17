@@ -16,13 +16,13 @@ public class MapGenEditor : Editor
         {
             if (mapGen.UpdateRealTime)
             {
-                mapGen.GenerateMap();
+                mapGen.DrawMapInEditor();
             }
         }
 
             if (GUILayout.Button("Generate"))
         {
-            mapGen.GenerateMap();
+            mapGen.DrawMapInEditor();
         }
     }
 }
