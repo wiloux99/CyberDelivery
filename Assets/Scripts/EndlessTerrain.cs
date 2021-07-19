@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EndlessTerrain : MonoBehaviour
 {
-    public const float maxViewDist = 450/4;
+    public const float maxViewDist = 450 / 15;
     public Transform viewer;
 
 
@@ -47,9 +47,9 @@ public class EndlessTerrain : MonoBehaviour
         int currentChunckCoordX = Mathf.RoundToInt(viewerPosition.x / chunckSize);
         int currentChunckCoordY = Mathf.RoundToInt(viewerPosition.y / chunckSize);
 
-        for (int yOffset = -chunckVisibleInViewDist; yOffset <= chunckVisibleInViewDist; yOffset++)
+        for (int yOffset = -chunckVisibleInViewDist; yOffset <= chunckVisibleInViewDist;  yOffset++)
         {
-            for (int xOffset = -chunckVisibleInViewDist; xOffset <= chunckVisibleInViewDist; xOffset++)
+            for (int xOffset = -chunckVisibleInViewDist; xOffset <= chunckVisibleInViewDist; xOffset++) 
             {
                 Vector2 viewedChunckCoord = new Vector2(currentChunckCoordX + xOffset, currentChunckCoordY + yOffset);
 
@@ -87,28 +87,44 @@ public class EndlessTerrain : MonoBehaviour
 
 
             meshObject = new GameObject("CityChunck");
-            meshObject.transform.localScale = Vector3.one * size / 10f;
+            //meshObject.transform.localScale = Vector3.one * size / 10f;
             meshObject.transform.position = positionV3;
             meshObject.transform.parent = parent;
 
 
-         //   OnPositionDataReceived(mapData, meshObject);
+            //   OnPositionDataReceived(mapData, meshObject);
 
 
             SetVisible(false);
-         //   Debug.Log(meshObject);
-            mapGenerator.RequestMapData(OnMapDataReceived, meshObject);
+            //   Debug.Log(meshObject);
+            mapGenerator.RequestMapData(OnMapDataReceived, position, meshObject);
         }
 
         void OnMapDataReceived(MapData posData)
         {
-            int i = 0;
-            foreach (Vector3 position in posData.pos)
+            foreach (PosBuildingValues values in posData.values)
             {
-                i++;
-                GameObject newBuilding = Instantiate(posData.buildings[Random.Range(0, posData.buildings.Count)], posData.gameObject.transform);
-                newBuilding.transform.name = "N°"+i;
-                newBuilding.transform.localPosition =position;
+                //i++;
+                GameObject newBuilding;
+                switch (values.currentBuildType)
+                {
+
+                    case PosBuildingValues.buildType.smallBuild:
+                        newBuilding = Instantiate(posData.buildings[0], posData.gameObject.transform);
+                        newBuilding.name = "small";
+                        newBuilding.transform.localPosition = values.pos;
+                        break;
+                    case PosBuildingValues.buildType.medBuild:
+                        newBuilding = Instantiate(posData.buildings[1], posData.gameObject.transform);
+                        newBuilding.name = "medium";
+                        newBuilding.transform.localPosition = values.pos;
+                        break;
+                    case PosBuildingValues.buildType.tallBuild:
+                        newBuilding = Instantiate(posData.buildings[2], posData.gameObject.transform);
+                        newBuilding.name = "tall";
+                        newBuilding.transform.localPosition = values.pos;
+                        break;
+                }
             }
         }
 

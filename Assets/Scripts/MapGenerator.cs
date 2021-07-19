@@ -22,12 +22,12 @@ public class MapGenerator : MonoBehaviour
 
     public TerrainType[] regions;
 
-    public const int mapChunckSize = 241/4;
+    public const int mapChunckSize = 241 / 10;
     [Range(0, 6)]
     public int levelOfDetail;
 
     public GameObject Chunck;
-    public List<Vector3> Pos = new List<Vector3>();
+    public List<PosBuildingValues> Pos = new List<PosBuildingValues>();
 
     [Space]
     public bool UpdateRealTime;
@@ -35,19 +35,19 @@ public class MapGenerator : MonoBehaviour
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<PosThreadInfo<PosData>> posDataThreadInfoQueue = new Queue<PosThreadInfo<PosData>>();
 
-    public void RequestMapData(System.Action<MapData> callback, GameObject _object)
+    public void RequestMapData(System.Action<MapData> callback, Vector2 centre, GameObject _object)
     {
         ThreadStart threadStart = delegate
         {
-            MapDataThread(callback, _object);
+            MapDataThread(callback, centre, _object);
         };
 
         new Thread(threadStart).Start();
     }
 
-    void MapDataThread(System.Action<MapData> callback, GameObject _object)
+    void MapDataThread(System.Action<MapData> callback, Vector2 centre, GameObject _object)
     {
-        MapData mapData = GenerateMapData();
+        MapData mapData = GenerateMapData(centre);
         mapData.gameObject = _object;
         lock (mapDataThreadInfoQueue)
             mapDataThreadInfoQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
@@ -55,7 +55,7 @@ public class MapGenerator : MonoBehaviour
 
     public void RequestPositionData(MapData mapData, System.Action<PosData> callback)
     {
-    
+
     }
 
     //void positiondatathread(mapdata mapdata, system.action<posdata> callback)
@@ -91,7 +91,7 @@ public class MapGenerator : MonoBehaviour
 
     public void DrawMapInEditor()
     {
-        MapData mapData = GenerateMapData();
+        MapData mapData = GenerateMapData(Vector2.zero);
         MapDisplay display = FindObjectOfType<MapDisplay>();
         if (drawMode == DrawMode.NoiseMap)
         {
@@ -103,9 +103,9 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    MapData GenerateMapData()
+    MapData GenerateMapData(Vector2 centre)
     {
-        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunckSize, mapChunckSize, seed, noiseScale, octaves, persistance, lacunarity, offset);
+        float[,] noiseMap = Noise.GenerateNoiseMap(mapChunckSize, mapChunckSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
 
         Color[] ColourMap = new Color[mapChunckSize * mapChunckSize];
         for (int y = 0; y < mapChunckSize; y++)
@@ -141,7 +141,7 @@ public class MapGenerator : MonoBehaviour
 
 
 
-        return new MapData(noiseMap, ColourMap, Pos, Buildings,null);
+        return new MapData(noiseMap, ColourMap, Pos, Buildings, null);
 
     }
 
@@ -198,18 +198,28 @@ public struct MapData
 {
     public readonly float[,] heightMap;
     public readonly Color[] colourMap;
-    public readonly List<Vector3> pos;
+    public readonly List<PosBuildingValues> values;
     public readonly List<GameObject> buildings;
-    public  GameObject gameObject;
+    public GameObject gameObject;
 
-    public MapData(float[,] heightMap, Color[] colourMap, List<Vector3> pos, List<GameObject> buildings, GameObject _gameObject)
+    public MapData(float[,] heightMap, Color[] colourMap, List<PosBuildingValues> values, List<GameObject> buildings, GameObject _gameObject)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
-        this.pos = pos;
+        this.values = values;
         this.buildings = buildings;
         this.gameObject = _gameObject;
     }
+}
+
+public class PosBuildingValues
+{
+    public Vector3 pos;
+    public enum buildType{
+        smallBuild, medBuild, tallBuild
+    };
+
+    public buildType currentBuildType;
 }
 
 public struct PosData

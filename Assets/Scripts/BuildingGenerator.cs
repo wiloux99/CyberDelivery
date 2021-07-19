@@ -5,18 +5,18 @@ using UnityEngine;
 public static class BuildingGenerator
 {
 
-    public static List<Vector3> GenerateBuildings(float[,] heightMap, float heightMultiplier, AnimationCurve heightCurve, int levelOfDetail, TerrainType[] regions)
+    public static List<PosBuildingValues> GenerateBuildings(float[,] heightMap, float heightMultiplier, AnimationCurve heightCurve, int levelOfDetail, TerrainType[] regions)
     {
         int width = heightMap.GetLength(0);
         int height = heightMap.GetLength(1);
         int simplification = (levelOfDetail == 0) ? 1 : levelOfDetail * 2;
-        List<Vector3> allPos = new List<Vector3>();
+        List<PosBuildingValues> posValues = new List<PosBuildingValues>();
         float topLeftX = (width - 1) / -2f;
         float topLeftZ = (height - 1) / 2f;
 
 
-       // int streetInt = Random.Range(height / 3, height);
-       // int streetWidth = Random.Range(1, 5);
+        // int streetInt = Random.Range(height / 3, height);
+        // int streetWidth = Random.Range(1, 5);
 
         for (int y = 0; y < height; y++)
         {
@@ -24,18 +24,38 @@ public static class BuildingGenerator
             {
                 if (heightMap[x, y] > regions[0].height)
                 {
-                    
+
                     //if(EndlessTerrain.IsBetween(y, streetInt - streetWidth, streetInt + streetWidth))
                     //{
                     //    break;
                     //}
+                    PosBuildingValues newPosValue = new PosBuildingValues();
 
-                    allPos.Add(new Vector3(x + topLeftX, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier,y - topLeftZ));
+                    if (heightMap[x, y] < regions[1].height)
+                    {
+                        newPosValue.currentBuildType = PosBuildingValues.buildType.smallBuild;
+                    }
+                    else if (heightMap[x, y] >= regions[1].height && heightMap[x, y] < regions[2].height)
+                    {
+                        newPosValue.currentBuildType = PosBuildingValues.buildType.medBuild;
+                    }
+                    else if (heightMap[x, y] >= regions[2].height)
+                    {
+                        newPosValue.currentBuildType = PosBuildingValues.buildType.tallBuild;
+                    }
+                    else
+                    {
+                        Debug.Log("poop");
+                    }
+
+                    newPosValue.pos = new Vector3(x + topLeftX, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, y - topLeftZ);
+                    posValues.Add(newPosValue);
+
                 }
             }
         }
 
-        return allPos;
+        return posValues;
     }
 
 }
