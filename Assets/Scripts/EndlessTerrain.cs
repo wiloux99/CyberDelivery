@@ -134,9 +134,9 @@ public class EndlessTerrain : MonoBehaviour
 
         public void UpdateChunck()
         {
-            float viewerDistanceFromNearestEdge = Mathf.Sqrt(bounds.SqrDistance(viewerPosition));
-            bool visible = viewerDistanceFromNearestEdge <= maxViewDist;
-            SetVisible(visible);
+            //float viewerDistanceFromNearestEdge = Mathf.Sqrt(bounds.SqrDistance(viewerPosition +Vector2.one));
+            //bool visible = viewerDistanceFromNearestEdge <= maxViewDist+10;
+            SetVisible(true);
         }
 
         public void SetVisible(bool visible)

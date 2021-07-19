@@ -8,6 +8,6 @@ public class MoveForward : MonoBehaviour
 
     void Update()
     {
-        transform.Translate(dir);
+        transform.Translate(dir * Time.deltaTime);
     }
 }
