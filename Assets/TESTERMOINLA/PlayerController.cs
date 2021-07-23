@@ -5,25 +5,30 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     Rigidbody rb;
-    [SerializeField]float speed;
-    [SerializeField] float jumpForce;
+    public float speed;
+    public float jumpForce;
     [Range(0f,1f)]
-    [SerializeField] float smoothRotation;
+    public float smoothRotation;
     private float SmoothVel;
+    public Transform cam;
 
-    [SerializeField] Transform cam;
+    public bool isGrounded;
 
-    Camera MainCamera;
+    public LayerMask layer = 3;
+
+    public Transform targetPos1;
+    public Transform targetPos2;
 
     private void Awake()
     {
-        
+
     }
 
 
     void Start()
     {
         rb = gameObject.GetComponent<Rigidbody>();
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
 
@@ -31,8 +36,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         Move();
+        Jump();
+        Debug.DrawRay(targetPos1.position, new Vector3(0,-0.2f,0));
 
-        
+
+
+
     }
 
     void Move()
@@ -53,11 +62,11 @@ public class PlayerController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
 
             Vector3 PlayerDirection = Quaternion.Euler(0f, PlayerAngle, 0f) * Vector3.forward;
-            Debug.Log("PD = " + PlayerDirection);
-            Debug.Log("MV = " + Movement);
+            //Debug.Log("PD = " + PlayerDirection);
+            //Debug.Log("MV = " + Movement);
 
 
-             rb.AddForce(new Vector3(Movement.x * speed * T, 0, Movement.z * speed * T), ForceMode.Force);
+             rb.AddForce(new Vector3(PlayerDirection.x * speed * T, 0, PlayerDirection.z * speed * T), ForceMode.Force);
         }
 
        
@@ -68,6 +77,27 @@ public class PlayerController : MonoBehaviour
 
     void Jump()
     {
-        if (Input.GetKey("Space")) { rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse); }
+
+        if (Input.GetKey("space") && isGrounded == true) { rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);}
     }
+
+    void RaycastCheck()
+    {
+
+        Ray ray;
+        ray = new Ray(targetPos1.position, new Vector3(0, -0.2f, 0));
+
+        Physics.Raycast(ray, -1, 3);
+
+        RaycastHit hit;
+
+        if (Physics.Raycast((ray, out hit ))
+        {
+
+        }
+    }
+
+   
+
+
 }
