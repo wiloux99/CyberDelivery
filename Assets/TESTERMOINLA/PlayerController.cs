@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
     private float SmoothVel;
     public Transform cam;
 
-    public bool isGrounded;
+    //public bool isGrounded;
 
     public LayerMask layer = 3;
 
@@ -37,7 +37,8 @@ public class PlayerController : MonoBehaviour
     {
         Move();
         Jump();
-        Debug.DrawRay(targetPos1.position, new Vector3(0,-0.2f,0));
+        IsGrounded();
+        Debug.DrawRay(targetPos1.position, Vector3.down);
 
 
 
@@ -78,23 +79,19 @@ public class PlayerController : MonoBehaviour
     void Jump()
     {
 
-        if (Input.GetKey("space") && isGrounded == true) { rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);}
+        if (Input.GetKey("space") && IsGrounded()) { rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);}
     }
 
-    void RaycastCheck()
+    bool IsGrounded()
     {
 
-        Ray ray;
-        ray = new Ray(targetPos1.position, new Vector3(0, -0.2f, 0));
 
-        Physics.Raycast(ray, -1, 3);
+        
 
         RaycastHit hit;
 
-        if (Physics.Raycast((ray, out hit ))
-        {
+        return Physics.Raycast(targetPos1.position, Vector3.down, out hit, 1f);
 
-        }
     }
 
    
