@@ -54,7 +54,6 @@ public class MapGenerator : MonoBehaviour
 
         if (terrain != null)
         {
-            Debug.Log("hewwo!");
             mapData.terrain = terrain;
         }
 

@@ -852,6 +852,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   viewer: {fileID: 242812849}
+  scaler: 10
   chunckSize: 0
 --- !u!114 &2120487827
 MonoBehaviour:

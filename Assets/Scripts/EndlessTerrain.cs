@@ -100,7 +100,6 @@ public class EndlessTerrain : MonoBehaviour
                 else
                 {
                     terrainChunck = new TerrainChunck(viewedChunckCoord, chunckSize, transform, true, scaler);
-                    Debug.Log(terrainChunck);
                     terrainChunckDictionary.Add(viewedChunckCoord, terrainChunck);
                     return terrainChunck;
                 }
