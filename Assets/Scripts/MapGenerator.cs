@@ -35,20 +35,29 @@ public class MapGenerator : MonoBehaviour
     Queue<MapThreadInfo<MapData>> mapDataThreadInfoQueue = new Queue<MapThreadInfo<MapData>>();
     Queue<PosThreadInfo<PosData>> posDataThreadInfoQueue = new Queue<PosThreadInfo<PosData>>();
 
-    public void RequestMapData(System.Action<MapData> callback, Vector2 centre, GameObject _object)
+    public void RequestMapData(System.Action<MapData> callback, Vector2 centre, GameObject _object, EndlessTerrain.TerrainChunck terrain = null)
     {
         ThreadStart threadStart = delegate
         {
-            MapDataThread(callback, centre, _object);
+
+
+            MapDataThread(callback, centre, _object, terrain);
         };
 
         new Thread(threadStart).Start();
     }
 
-    void MapDataThread(System.Action<MapData> callback, Vector2 centre, GameObject _object)
+    void MapDataThread(System.Action<MapData> callback, Vector2 centre, GameObject _object, EndlessTerrain.TerrainChunck terrain = null)
     {
         MapData mapData = GenerateMapData(centre);
         mapData.gameObject = _object;
+
+        if (terrain != null)
+        {
+            Debug.Log("hewwo!");
+            mapData.terrain = terrain;
+        }
+
         lock (mapDataThreadInfoQueue)
             mapDataThreadInfoQueue.Enqueue(new MapThreadInfo<MapData>(callback, mapData));
     }
@@ -103,7 +112,7 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    MapData GenerateMapData(Vector2 centre)
+    public MapData GenerateMapData(Vector2 centre)
     {
         float[,] noiseMap = Noise.GenerateNoiseMap(mapChunckSize, mapChunckSize, seed, noiseScale, octaves, persistance, lacunarity, centre + offset);
 
@@ -201,21 +210,24 @@ public struct MapData
     public readonly List<PosBuildingValues> values;
     public readonly List<GameObject> buildings;
     public GameObject gameObject;
+    public EndlessTerrain.TerrainChunck terrain;
 
-    public MapData(float[,] heightMap, Color[] colourMap, List<PosBuildingValues> values, List<GameObject> buildings, GameObject _gameObject)
+    public MapData(float[,] heightMap, Color[] colourMap, List<PosBuildingValues> values, List<GameObject> buildings, GameObject _gameObject, EndlessTerrain.TerrainChunck terrain = null)
     {
         this.heightMap = heightMap;
         this.colourMap = colourMap;
         this.values = values;
         this.buildings = buildings;
         this.gameObject = _gameObject;
+        this.terrain = terrain;
     }
 }
 
 public class PosBuildingValues
 {
     public Vector3 pos;
-    public enum buildType{
+    public enum buildType
+    {
         smallBuild, medBuild, tallBuild
     };
 
