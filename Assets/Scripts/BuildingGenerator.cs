@@ -44,8 +44,8 @@ public static class BuildingGenerator
                         newPosValue.currentBuildType = PosBuildingValues.buildType.tallBuild;
                     }
                     newPosValue.pos = new Vector3(x + topLeftX, heightCurve.Evaluate(heightMap[x, y]) * heightMultiplier, y - topLeftZ);
-                    
-                    if(newPosValue != null)
+
+                    if (newPosValue.currentBuildType != PosBuildingValues.buildType.none)
                     posValues.Add(newPosValue);
 
                 }

@@ -228,10 +228,10 @@ public class PosBuildingValues
     public Vector3 pos;
     public enum buildType
     {
-        smallBuild, medBuild, tallBuild
+        none,smallBuild, medBuild, tallBuild
     };
 
-    public buildType currentBuildType;
+    public buildType currentBuildType = buildType.none;
 }
 
 public struct PosData
