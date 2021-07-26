@@ -6,6 +6,7 @@ public class EndlessTerrain : MonoBehaviour
 {
     public const float maxViewDist = 450 / 15;
     public Transform viewer;
+    public int scaler;
 
 
     public static Vector2 viewerPosition;
@@ -13,13 +14,13 @@ public class EndlessTerrain : MonoBehaviour
     public int chunckSize;
     int chunckVisibleInViewDist;
 
-    Dictionary<Vector2, TerrainChunck> terrainChunckDictionary = new Dictionary<Vector2, TerrainChunck>();
+    public Dictionary<Vector2, TerrainChunck> terrainChunckDictionary = new Dictionary<Vector2, TerrainChunck>();
     List<TerrainChunck> terrainChuncksVisibleLastUpdate = new List<TerrainChunck>();
 
     private void Start()
     {
         mapGenerator = FindObjectOfType<MapGenerator>();
-        chunckSize = MapGenerator.mapChunckSize - 1;
+        chunckSize = MapGenerator.mapChunckSize;
         chunckVisibleInViewDist = Mathf.RoundToInt(maxViewDist / chunckSize);
     }
 
@@ -47,9 +48,9 @@ public class EndlessTerrain : MonoBehaviour
         int currentChunckCoordX = Mathf.RoundToInt(viewerPosition.x / chunckSize);
         int currentChunckCoordY = Mathf.RoundToInt(viewerPosition.y / chunckSize);
 
-        for (int yOffset = -chunckVisibleInViewDist; yOffset <= chunckVisibleInViewDist;  yOffset++)
+        for (int yOffset = -chunckVisibleInViewDist; yOffset <= chunckVisibleInViewDist; yOffset++)
         {
-            for (int xOffset = -chunckVisibleInViewDist; xOffset <= chunckVisibleInViewDist; xOffset++) 
+            for (int xOffset = -chunckVisibleInViewDist; xOffset <= chunckVisibleInViewDist; xOffset++)
             {
                 Vector2 viewedChunckCoord = new Vector2(currentChunckCoordX + xOffset, currentChunckCoordY + yOffset);
 
@@ -64,30 +65,68 @@ public class EndlessTerrain : MonoBehaviour
                 }
                 else
                 {
-                    terrainChunckDictionary.Add(viewedChunckCoord, new TerrainChunck(viewedChunckCoord, chunckSize, transform));
+                    terrainChunckDictionary.Add(viewedChunckCoord, new TerrainChunck(viewedChunckCoord, chunckSize, transform, false, scaler));
                 }
             }
         }
     }
+    public TerrainChunck SpawnChunck(Vector2 positionSpawnChunck)
+    {
+        for (int i = 0; i < terrainChuncksVisibleLastUpdate.Count; i++)
+        {
+            terrainChuncksVisibleLastUpdate[i].SetVisible(false);
+        }
 
+        terrainChuncksVisibleLastUpdate.Clear();
+        int currentChunckCoordX = Mathf.RoundToInt(positionSpawnChunck.x / chunckSize);
+        int currentChunckCoordY = Mathf.RoundToInt(positionSpawnChunck.y / chunckSize);
+        TerrainChunck terrainChunck;
+
+        for (int yOffset = -chunckVisibleInViewDist; yOffset <= chunckVisibleInViewDist; yOffset++)
+        {
+            for (int xOffset = -chunckVisibleInViewDist; xOffset <= chunckVisibleInViewDist; xOffset++)
+            {
+                Vector2 viewedChunckCoord = new Vector2(currentChunckCoordX + xOffset, currentChunckCoordY + yOffset);
+
+                if (terrainChunckDictionary.ContainsKey(viewedChunckCoord))
+                {
+                    terrainChunckDictionary[viewedChunckCoord].UpdateChunck();
+
+                    if (terrainChunckDictionary[viewedChunckCoord].isVisible())
+                    {
+                        terrainChuncksVisibleLastUpdate.Add(terrainChunckDictionary[viewedChunckCoord]);
+                    }
+                }
+                else
+                {
+                    terrainChunck = new TerrainChunck(viewedChunckCoord, chunckSize, transform, true, scaler);
+                    terrainChunckDictionary.Add(viewedChunckCoord, terrainChunck);
+                    return terrainChunck;
+                }
+            }
+        }
+        return null;
+
+    }
     public class TerrainChunck
     {
-        GameObject meshObject;
-        Vector2 position;
-        Bounds bounds;
+        public GameObject meshObject;
+        public Vector2 position;
+        public Bounds bounds;
+        public List<Vector2> buildingPos = new List<Vector2>();
 
         MapData mapData;
 
 
-        public TerrainChunck(Vector2 coord, int size, Transform parent)
+        public TerrainChunck(Vector2 coord, int size, Transform parent, bool needTerrainPos, int scaler = 10)
         {
-            position = coord * size;
+            position = coord * size * scaler;
             bounds = new Bounds(position, Vector2.one * size);
             Vector3 positionV3 = new Vector3(position.x, 0, position.y);
 
 
-            meshObject = new GameObject("CityChunck");
-            //meshObject.transform.localScale = Vector3.one * size / 10f;
+            meshObject = new GameObject("CityChunck " + coord);
+            meshObject.transform.localScale = new Vector3(-scaler, scaler, scaler);
             meshObject.transform.position = positionV3;
             meshObject.transform.parent = parent;
 
@@ -97,7 +136,7 @@ public class EndlessTerrain : MonoBehaviour
 
             SetVisible(false);
             //   Debug.Log(meshObject);
-            mapGenerator.RequestMapData(OnMapDataReceived, position, meshObject);
+            mapGenerator.RequestMapData(OnMapDataReceived, position, meshObject, needTerrainPos ? this : null);
         }
 
         void OnMapDataReceived(MapData posData)
@@ -126,6 +165,16 @@ public class EndlessTerrain : MonoBehaviour
                         break;
                 }
             }
+
+            if (posData.terrain != null)
+            {
+                Debug.Log(posData.values.Count);
+                for (int i = 0; i < posData.values.Count; i++)
+                {
+                    posData.terrain.buildingPos.Add(posData.values[i].pos);
+                }
+            }
+
         }
 
         void OnPositionDataReceived(MapData posData, GameObject _meshObject = null)
