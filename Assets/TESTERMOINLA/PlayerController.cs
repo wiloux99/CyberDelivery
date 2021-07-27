@@ -81,15 +81,13 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (Movement.magnitude >= 0.1f && Input.GetMouseButton(1) == false)
+        if (Movement.magnitude >= 0.1f)
         {
             float PlayerAngle = Mathf.Atan2(Movement.x, Movement.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
             float SmoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, PlayerAngle, ref SmoothVel, smoothRotation);
             transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
 
             Vector3 PlayerDirection = Quaternion.Euler(0f, PlayerAngle, 0f) * Vector3.forward;
-            //Debug.Log("PD = " + PlayerDirection);
-            //Debug.Log("MV = " + Movement);
 
 
             rb.AddForce(new Vector3(PlayerDirection.x * speed * T, 0, PlayerDirection.z * speed * T), ForceMode.Force);
@@ -111,16 +109,13 @@ public class PlayerController : MonoBehaviour
                 rb.velocity = rb.velocity * 0f;
             }
 
+            float PlayerAngle = Mathf.Atan2(Movement.x, Movement.z) * Mathf.Rad2Deg + cam.eulerAngles.y;
+            float SmoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, PlayerAngle, ref SmoothVel, smoothRotation);
+            transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
+
+
+
         }
-
-        //if (Input.GetMouseButton(1))
-        //{
-        //    float PlayerAngle = Mathf.Rad2Deg + cam.eulerAngles.y;
-        //    float SmoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, PlayerAngle, ref SmoothVel, smoothRotation);
-        //    transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
-
-
-        //}
 
     }
 
