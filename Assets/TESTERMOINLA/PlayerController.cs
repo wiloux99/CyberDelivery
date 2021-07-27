@@ -14,6 +14,8 @@ public class PlayerController : MonoBehaviour
     private float SmoothVel;
     public Transform cam;
 
+    public Vector2 direction;
+
     //public bool isGrounded;
 
     public LayerMask layer = 3;
@@ -40,11 +42,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        
-
-  
 
 
+
+
+        InputCheck();
 
 
 
@@ -52,22 +54,29 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Move();
+        Move(direction);
         Jump();
         IsGrounded();
-        DebugText();
+        if (velText != null)
+            DebugText();
     }
 
-    void Move()
+    void InputCheck()
+    {
+        direction.x = Input.GetAxisRaw("Horizontal");
+        direction.y = Input.GetAxisRaw("Vertical");
+        if (Input.GetKeyDown("space") && IsGrounded()) { needJump = true; }
+    }
+
+    void Move(Vector2 direction)
     {
 
 
 
         float T = Time.deltaTime;
-        float hor = Input.GetAxisRaw("Horizontal");
-        float ver = Input.GetAxisRaw("Vertical");
 
-        Vector3 Movement = new Vector3(hor, 0, ver).normalized;
+
+        Vector3 Movement = new Vector3(direction.x, 0, direction.y).normalized;
 
 
 
@@ -104,21 +113,28 @@ public class PlayerController : MonoBehaviour
 
         }
 
-        if (Input.GetMouseButton(1))
-        {
-            float PlayerAngle = Mathf.Rad2Deg + cam.eulerAngles.y;
-            float SmoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, PlayerAngle, ref SmoothVel, smoothRotation);
-            transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
+        //if (Input.GetMouseButton(1))
+        //{
+        //    float PlayerAngle = Mathf.Rad2Deg + cam.eulerAngles.y;
+        //    float SmoothAngle = Mathf.SmoothDampAngle(transform.eulerAngles.y, PlayerAngle, ref SmoothVel, smoothRotation);
+        //    transform.rotation = Quaternion.Euler(0f, SmoothAngle, 0f);
 
 
-        }
-        
+        //}
+
     }
+
+    public bool needJump;
 
     void Jump()
     {
 
-        if (Input.GetKeyDown("space") && IsGrounded()) { rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse); }
+        if (needJump)
+        {
+            needJump = false;
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.Impulse);
+        }
+
     }
 
     bool IsGrounded()
@@ -129,8 +145,9 @@ public class PlayerController : MonoBehaviour
 
     }
 
-     void DebugText()
+    void DebugText()
     {
+
         velText.text = "Speed = " + rb.velocity.magnitude.ToString("0F");
 
         if (IsGrounded() == true)
