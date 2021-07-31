@@ -225,9 +225,11 @@ public struct MapData
 public class PosBuildingValues
 {
     public Vector3 pos;
+    public Vector2 heightMapValue;
+
     public enum buildType
     {
-        none,smallBuild, medBuild, tallBuild
+        none,smallBuild, medBuild, tallBuild, ad
     };
 
     public buildType currentBuildType = buildType.none;

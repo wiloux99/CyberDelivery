@@ -150,19 +150,25 @@ public class EndlessTerrain : MonoBehaviour
 
                     case PosBuildingValues.buildType.smallBuild:
                         newBuilding = Instantiate(posData.buildings[0], posData.gameObject.transform);
-                        newBuilding.name = "small";
+                        newBuilding.name = "small" + values.heightMapValue;
                         newBuilding.transform.localPosition = values.pos;
                         break;
                     case PosBuildingValues.buildType.medBuild:
                         newBuilding = Instantiate(posData.buildings[1], posData.gameObject.transform);
-                        newBuilding.name = "medium";
+                        newBuilding.name = "medium" + values.heightMapValue;
                         newBuilding.transform.localPosition = values.pos;
                         break;
                     case PosBuildingValues.buildType.tallBuild:
                         newBuilding = Instantiate(posData.buildings[2], posData.gameObject.transform);
-                        newBuilding.name = "tall";
+                        newBuilding.name = "tall" + values.heightMapValue;
                         newBuilding.transform.localPosition = values.pos;
                         break;
+                    case PosBuildingValues.buildType.ad:
+                        newBuilding = Instantiate(posData.buildings[3], new Vector3(posData.gameObject.transform.position.x, posData.gameObject.transform.position.y + Random.Range(0,50f), posData.gameObject.transform.position.z), Quaternion.identity, posData.gameObject.transform);
+                        newBuilding.name = "ad" + values.heightMapValue;
+                        newBuilding.transform.localPosition = values.pos;
+                        break;
+
                 }
             }
 
